@@ -1,6 +1,6 @@
 ---
 - name: Apply Windows Updates
-  hosts: windows
+  hosts: 172.29.10.214
   gather_facts: no
   tasks:
     - name: Install all available updates
