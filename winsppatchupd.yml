@@ -1,0 +1,10 @@
+---
+- name: Apply Windows Updates
+  hosts: windows
+  gather_facts: no
+  tasks:
+    - name: Install all available updates
+      ansible.windows.win_updates:
+        kb_article_ids:
+          - KB5041587
+        reboot: yes
