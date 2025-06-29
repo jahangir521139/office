@@ -6,5 +6,5 @@
     - name: Install all available updates
       ansible.windows.win_updates:
         kb_article_ids:
-          - KB5041587
+          - KB5022906
         reboot: yes
