@@ -1,0 +1,39 @@
+---
+- name: Gather Windows OS Info and Last Update
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Get last Windows Update date
+      win_shell: |
+        (Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select-Object -First 1).InstalledOn
+      register: win_update
+
+    - name: Set per-host OS info fact for Excel
+      set_fact:
+        os_info_row:
+          - "{{ ansible_hostname }}"
+          - "{{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "{{ ansible_architecture }}"
+          - "{{ ansible_default_ipv4.address }}"
+          - "{{ win_update.stdout | trim }}"
+
+- name: Generate Excel Report from collected host data
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Aggregate all host rows for Excel
+      set_fact:
+        all_rows: >-
+          {% set rows = [] %}
+          {% for host in groups['all'] %}
+            {% set _ = rows.append(hostvars[host].os_info_row) %}
+          {% endfor %}
+          {{ rows }}
+
+    - name: Write data to Excel file
+      community.general.xlsx_writer:
+        path: "./windows_os_report.xlsx"
+        data:
+          - sheet: "Windows"
+            headers: ["Hostname", "OS", "Architecture", "IP", "Last Update"]
+            rows: "{{ all_rows }}"
