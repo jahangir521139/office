@@ -17,3 +17,27 @@
           Architecture: {{ ansible_architecture }}
           Hostname: {{ ansible_hostname }}
           Last Update: {{ win_updates.stdout }}
+          
+    - name: Add OS info to central file (delegated to localhost)
+      delegate_to: localhost
+      run_once: true
+      vars:
+        reports: "{{ hostvars | dict2items | map(attribute='value.os_info_report') | join('\n\n') }}"
+      copy:
+        content: "{{ reports }}"
+        dest: "./os_info_report.txt"
+
+- name: Send OS info email
+  hosts: localhost
+  tasks:
+    - name: Email report
+      community.general.mail:
+        host: 103.159.0.237
+        port: 465
+        username: ansible@upay.systems
+        password: Upay@321
+        to: m.jahangir.alam@ucb.com.bd
+        subject: "OS Info Report"
+        body: "Attached is the full OS information report for all servers."
+        attach:
+          - "./os_info_report.txt"
