@@ -25,7 +25,7 @@
         reports: "{{ hostvars | dict2items | map(attribute='value.os_info_report') | join('\n\n') }}"
       copy:
         content: "{{ reports }}"
-        dest: "./os_info_report.txt"
+        dest: "./os_info_report.csv"
 
 - name: Send OS info email
   hosts: localhost
@@ -40,4 +40,4 @@
         subject: "OS Info Report"
         body: "Attached is the full OS information report for all servers."
         attach:
-          - "./os_info_report.txt"
+          - "./os_info_report.csv"
