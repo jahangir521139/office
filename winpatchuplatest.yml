@@ -1,0 +1,11 @@
+---
+- name: Apply Windows Updates
+  hosts: 172.29.10.214
+  gather_facts: no
+  tasks:
+    - name: Install all available updates
+      ansible.windows.win_updates:
+        category_names:
+          - SecurityUpdates
+          - CriticalUpdates
+        reboot: yes
