@@ -10,7 +10,7 @@
 
     - name: Set CSV line
       set_fact:
-        os_info_line: "{{ ansible_hostname }},{{ ansible_distribution }} {{ ansible_distribution_version }},{{ ansible_architecture }},{{ ansible_default_ipv4.address }},{{ win_update.stdout | trim }}"
+        os_info_line: "{{ ansible_hostname }},{{ ansible_distribution }} {{ ansible_distribution_version }},{{ ansible_architecture }},{{ ansible_kernel }},{{ win_update.stdout | trim }}"
 
 - name: Combine CSV on controller
   hosts: localhost
@@ -28,3 +28,18 @@
       copy:
         content: "{{ csv_report }}"
         dest: "./windows_os_report.csv"
+        
+- name: Send OS info email
+  hosts: localhost
+  tasks:
+    - name: Email report
+      community.general.mail:
+        host: 103.159.0.237
+        port: 465
+        username: ansible@upay.systems
+        password: Upay@321
+        to: m.jahangir.alam@ucb.com.bd
+        subject: "OS Info Report"
+        body: "Attached is the full OS information report for all servers."
+        attach:
+          - "./windows_os_report.csv"
