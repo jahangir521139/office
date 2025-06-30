@@ -5,7 +5,7 @@
   tasks:
     - name: Get last Windows Update
       win_shell: |
-        (Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select-Object -First 1).InstalledOn
+        (Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select-Object -First 1).InstalledOn,HotFixID 
       register: win_update
 
     - name: Set CSV line
