@@ -1,13 +1,26 @@
 ---
-- name: Install specific Windows update
+---
+- name: Install KB5058481 patch manually
   hosts: all
   gather_facts: no
   tasks:
+    - name: Ensure C:\Temp exists
+      win_file:
+        path: C:\Temp
+        state: directory
+
     - name: Download KB5058481 patch
       win_get_url:
         url: "https://catalog.s.download.windowsupdate.com/c/msdownload/update/software/updt/2025/05/windows10.0-kb5058481-arm64_7015c59eb341d5a81ed70cc2768c3896d1e2028a.msu"
         dest: "C:\\Temp\\KB5058481.msu"
 
     - name: Install KB5058481 patch
-      win_command: >
-        wusa.exe C:\\Temp\\KB5058481.msu /quiet /norestart
+      win_command: wusa.exe C:\\Temp\\KB5058481.msu /quiet /norestart
+      register: patch_result
+      ignore_errors: true
+
+    - name: Reboot if required
+      win_reboot:
+        msg: "Restarting after installing KB5058481"
+        pre_reboot_delay: 30
+      when: patch_result.rc == 3010
