@@ -1,8 +1,12 @@
 ---
-- name: Apply Windows Updates
-  hosts: all
+- name: Install specific Windows update
+  hosts: windows
   gather_facts: no
   tasks:
-    - name: Install all available updates
+    - name: Install KB5006670 patch
       ansible.windows.win_updates:
+        kb_article_ids:
+          - KB5019959
+        category_names:
+          - SecurityUpdates
         reboot: yes
