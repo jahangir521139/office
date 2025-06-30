@@ -1,5 +1,4 @@
 ---
----
 - name: Install KB5058481 patch manually
   hosts: all
   gather_facts: no
