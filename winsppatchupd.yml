@@ -1,6 +1,6 @@
 ---
 - name: Install specific Windows update
-  hosts: windows
+  hosts: all
   gather_facts: no
   tasks:
     - name: Install KB5006670 patch
