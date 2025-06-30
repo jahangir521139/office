@@ -5,7 +5,7 @@
   tasks:
     - name: Download KB5058481 patch
       win_get_url:
-        url: "https://download.windowsupdate.com/d/msdownload/update/software/updt/2025/06/windows10.0-kb5058481-x64.msu"
+        url: "https://catalog.s.download.windowsupdate.com/c/msdownload/update/software/updt/2025/05/windows10.0-kb5058481-arm64_7015c59eb341d5a81ed70cc2768c3896d1e2028a.msu"
         dest: "C:\\Temp\\KB5058481.msu"
 
     - name: Install KB5058481 patch
