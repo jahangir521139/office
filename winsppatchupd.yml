@@ -3,10 +3,11 @@
   hosts: all
   gather_facts: no
   tasks:
+    - name: Download KB5058481 patch
+      win_get_url:
+        url: "https://download.windowsupdate.com/d/msdownload/update/software/updt/2025/06/windows10.0-kb5058481-x64.msu"
+        dest: "C:\\Temp\\KB5058481.msu"
+
     - name: Install KB5058481 patch
-      ansible.windows.win_updates:
-        kb_article_ids:
-          - KB5058481
-        category_names:
-          - SecurityUpdates
-        reboot: yes
+      win_command: >
+        wusa.exe C:\\Temp\\KB5058481.msu /quiet /norestart
