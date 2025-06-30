@@ -4,8 +4,8 @@
   gather_facts: no
   tasks:
 
-    - name: Install KB5058481 patch
-      win_command: wusa.exe C:\\Temp\\KB5058481.msu /quiet /norestart
+    - name: Install KB5061087 patch
+      win_command: wusa.exe C:\\Temp\\KB5061087.msu /quiet /norestart
       register: patch_result
       ignore_errors: true
 
