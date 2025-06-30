@@ -1,0 +1,16 @@
+---
+- name: Install KB5058481 patch manually
+  hosts: all
+  gather_facts: no
+  tasks:
+
+    - name: Install KB5058481 patch
+      win_command: wusa.exe C:\\Temp\\KB5058481.msu /quiet /norestart
+      register: patch_result
+      ignore_errors: true
+
+    - name: Reboot if required
+      win_reboot:
+        msg: "Restarting after installing KB5058481"
+        pre_reboot_delay: 30
+      when: patch_result.rc == 3010
