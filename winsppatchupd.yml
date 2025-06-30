@@ -10,11 +10,11 @@
 
     - name: Download KB5058481 patch
       win_get_url:
-        url: "https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/updt/2025/06/windows10.0-kb5061087-arm64_bccf464dbd6052800f74c11ebd11ba43e6fe8938.msu"
-        dest: "C:\\Temp\\KB5058481.msu"
+        url: "https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/updt/2025/06/windows10.0-kb5061087-x64_60be6e73e95c9e0cbfb82eb57e5d6088413a6866.msu"
+        dest: "C:\\Temp\\KB5061087.msu"
 
-    - name: Install KB5058481 patch
-      win_command: wusa.exe C:\\Temp\\KB5058481.msu /quiet /norestart
+    - name: Install KB5061087 patch
+      win_command: wusa.exe C:\\Temp\\KB5061087.msu /quiet /norestart
       register: patch_result
       ignore_errors: true
 
