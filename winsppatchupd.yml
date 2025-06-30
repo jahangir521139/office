@@ -1,8 +1,8 @@
 ---
-- name: Install all available updates
+- name: Apply Windows Updates
   hosts: all
-  ansible.windows.win_updates:
-    category_names:
-      - SecurityUpdates
-      - CriticalUpdates
-    reboot: yes
+  gather_facts: no
+  tasks:
+    - name: Install all available updates
+      ansible.windows.win_updates:
+        reboot: yes
