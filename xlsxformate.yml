@@ -10,7 +10,7 @@
 
     - name: Set CSV line
       set_fact:
-        os_info_line: "{{ ansible_hostname }},{{ inventory_hostname }},{{ ansible_distribution }} {{ ansible_distribution_version }},{{ ansible_kernel }},{{ ansible_architecture }},{{ win_update.stdout | trim }}"
+        os_info_line: "{{ ansible_hostname }},{{ inventory_hostname }},{{ ansible_distribution }} {{ ansible_distribution_version }},{{ ansible_kernel }},{{ ansible_architecture }},{{ win_update.stdout }}"
 
 - name: Combine CSV on controller
   hosts: localhost
