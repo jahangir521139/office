@@ -3,7 +3,7 @@
   hosts: all
   gather_facts: no
   tasks:
-    - name: Install KB5006670 patch
+    - name: Install KB5019959 patch
       ansible.windows.win_updates:
         kb_article_ids:
           - KB5019959
