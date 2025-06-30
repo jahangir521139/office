@@ -3,10 +3,10 @@
   hosts: all
   gather_facts: no
   tasks:
-    - name: Install KB5019959 patch
+    - name: Install KB5058481 patch
       ansible.windows.win_updates:
         kb_article_ids:
-          - KB5019959
+          - KB5058481
         category_names:
           - SecurityUpdates
         reboot: yes
