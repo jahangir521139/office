@@ -16,9 +16,9 @@
 
     - name: Show patch result
       debug:
-	      msg: |
-          stdout: {{ patch_result.stdout }}
-	        stderr: {{ patch_result.stderr }}
+        msg: | 
+	  stdout: {{ patch_result.stdout }}
+          stderr: {{ patch_result.stderr }}
 
     - name: Reboot if required
       win_reboot:
