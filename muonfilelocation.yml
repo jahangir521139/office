@@ -4,22 +4,8 @@
   gather_facts: no
   tasks:
 
-    - name: Ensure C:\Temp exists
-      win_file:
-        path: C:\Temp
-        state: directory
-
     - name: Install KB5061087 patch
       win_shell: wusa.exe C:\Temp\KB5061087.msu /quiet /norestart
       register: patch_result
       ignore_errors: true
 
-    - name: Show patch result
-      debug:
-        msg: "Patch installation finished with return code: {{ patch_result.rc }}"
-
-    - name: Reboot if required
-      win_reboot:
-        msg: "Restarting after installing KB5061087"
-        pre_reboot_delay: 30
-      when: patch_result.rc == 3010
