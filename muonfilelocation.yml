@@ -8,6 +8,13 @@
       win_file:
         path: C:\Temp
         state: directory
+    
+    - name: Allow WinRM local admin to run elevated commands
+      win_regedit:
+        path: HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+        name: LocalAccountTokenFilterPolicy
+        data: 1
+        type: dword
 
     - name: Install KB5061087 patch
       win_command: wusa.exe C:\Temp\KB5061087.msu /quiet /norestart
