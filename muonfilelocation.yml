@@ -11,9 +11,8 @@
 
     - name: Install KB5061087 patch
       win_shell: |
-        wusa.exe C:\Temp\KB5061087.msu /quiet /norestart
+        powershell -Command "Start-Process wusa.exe -ArgumentList 'C:\Temp\KB5061087.msu /quiet /norestart' -Wait"
       register: patch_result
-      ignore_errors: true
 
     - name: Show full patch result
       debug:
