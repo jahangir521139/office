@@ -4,10 +4,10 @@
   gather_facts: no
   tasks:
 
-   - name: Install KB5061087 patch
-     win_command: "wusa.exe C:\\Temp\\KB5061087.msu /quiet /norestart"
-     register: patch_result
+    - name: Ensure C:\Temp exists
+      win_file:
+        path: C:\Temp
+        state: directory
 
-    - name: Show full patch result
-      debug:
-        var: patch_result
+    - name: Install KB5061087 patch
+      win_shell: wusa.exe C:\Temp\KB5061087.msu /quiet /norestart
