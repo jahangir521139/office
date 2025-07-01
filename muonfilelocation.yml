@@ -14,3 +14,7 @@
         wusa.exe C:\Temp\KB5061087.msu /quiet /norestart
       register: patch_result
       ignore_errors: true
+
+    - name: Show full patch result
+      debug:
+        var: patch_result
