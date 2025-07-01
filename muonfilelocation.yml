@@ -11,3 +11,4 @@
 
     - name: Install KB5061087 patch
       win_shell: wusa.exe C:\Temp\KB5061087.msu /quiet
+      
