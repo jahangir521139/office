@@ -3,12 +3,8 @@
   hosts: all
   gather_facts: no
   tasks:
-
-    - name: Run wusa.exe with elevated privileges
-      win_shell: Start-Process -FilePath "wusa.exe" -ArgumentList "C:\Temp\KB5061087.msu /quiet /norestart" -Verb RunAs
       
     - name: Install KB5061087 patch
       win_shell: wusa.exe C:\Temp\KB5061087.msu /quiet /norestart
-      register: patch_result
 
 
