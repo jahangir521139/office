@@ -1,0 +1,19 @@
+---
+- name: Install Windows Patch Manually
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ensure C:\Temp directory exists
+      ansible.windows.win_file:
+        path: C:\Temp
+        state: directory
+
+    - name: Install the Windows update patch manually
+      ansible.windows.win_command: >
+        wusa.exe C:\Temp\KB5061087.msu /quiet /norestart
+      register: patch_install
+
+    - name: Show patch result
+      debug:
+        msg: "Patch installation finished with return code: {{ patch_install.rc }}"
+
