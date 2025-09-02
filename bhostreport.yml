@@ -1,89 +1,58 @@
 ---
-- name: Collect browser versions and generate CSV report
+- name: Check browser versions on Windows hosts
   hosts: all
-  gather_facts: yes
-  vars:
-    csv_file_path: "/tmp/browser_report.csv"    # Path on AWX control node (Linux)
+  gather_facts: no
 
   tasks:
     - name: Get Microsoft Edge version
       win_shell: |
-        if (Test-Path 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe') {
-          (Get-ItemProperty 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe').VersionInfo.ProductVersion
-        } elseif (Test-Path 'C:\Program Files\Microsoft\Edge\Application\msedge.exe') {
-          (Get-ItemProperty 'C:\Program Files\Microsoft\Edge\Application\msedge.exe').VersionInfo.ProductVersion
-        } else {
-          "Not found"
+        $paths = @(
+          'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
+          'C:\Program Files\Microsoft\Edge\Application\msedge.exe'
+        )
+        foreach ($path in $paths) {
+          if (Test-Path $path) {
+            (Get-Item $path).VersionInfo.ProductVersion
+            break
+          }
         }
       register: edge_version
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Get Google Chrome version
       win_shell: |
-        if (Test-Path 'C:\Program Files\Google\Chrome\Application\chrome.exe') {
-          (Get-ItemProperty 'C:\Program Files\Google\Chrome\Application\chrome.exe').VersionInfo.ProductVersion
-        } elseif (Test-Path 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe') {
-          (Get-ItemProperty 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe').VersionInfo.ProductVersion
-        } else {
-          "Not found"
+        $paths = @(
+          'C:\Program Files\Google\Chrome\Application\chrome.exe',
+          'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe'
+        )
+        foreach ($path in $paths) {
+          if (Test-Path $path) {
+            (Get-Item $path).VersionInfo.ProductVersion
+            break
+          }
         }
       register: chrome_version
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Get Mozilla Firefox version
       win_shell: |
-        if (Test-Path 'C:\Program Files\Mozilla Firefox\firefox.exe') {
-          (Get-ItemProperty 'C:\Program Files\Mozilla Firefox\firefox.exe').VersionInfo.ProductVersion
-        } elseif (Test-Path 'C:\Program Files (x86)\Mozilla Firefox\firefox.exe') {
-          (Get-ItemProperty 'C:\Program Files (x86)\Mozilla Firefox\firefox.exe').VersionInfo.ProductVersion
-        } else {
-          "Not found"
+        $paths = @(
+          'C:\Program Files\Mozilla Firefox\firefox.exe',
+          'C:\Program Files (x86)\Mozilla Firefox\firefox.exe'
+        )
+        foreach ($path in $paths) {
+          if (Test-Path $path) {
+            (Get-Item $path).VersionInfo.ProductVersion
+            break
+          }
         }
       register: firefox_version
-      ignore_errors: yes
+      ignore_errors: true
 
-    - name: Set facts for report data
-      set_fact:
-        report_line:
-          hostname: "{{ inventory_hostname }}"
-          ip: "{{ ansible_default_ipv4.address }}"
-          edge: "{{ edge_version.stdout | default('Not found') }}"
-          chrome: "{{ chrome_version.stdout | default('Not found') }}"
-          firefox: "{{ firefox_version.stdout | default('Not found') }}"
-
-    - name: Add report_line to global report (on control node)
-      set_fact:
-        global_report: "{{ (global_report | default([])) + [report_line] }}"
-      delegate_to: localhost
-      run_once: false
-
-- name: Create CSV and send mail (on localhost)
-  hosts: localhost
-  gather_facts: no
-  vars:
-    csv_file_path: "/tmp/browser_report.csv"  # Adjust path if needed
-  tasks:
-    - name: Create CSV header
-      copy:
-        content: "Hostname,IP Address,Edge Version,Chrome Version,Firefox Version\n"
-        dest: "{{ csv_file_path }}"
-        mode: '0644'
-
-    - name: Append each report line to CSV
-      lineinfile:
-        path: "{{ csv_file_path }}"
-        line: "{{ item.hostname }},{{ item.ip }},{{ item.edge }},{{ item.chrome }},{{ item.firefox }}"
-        create: no
-        insertafter: EOF
-      loop: "{{ hostvars | dict2items | map(attribute='value.global_report') | select('defined') | list | first }}"
-    
-    - name: Send CSV report via email
-      community.general.mail:
-        host: 103.159.0.237   # Update SMTP
-        port: 465
-	username: ansible@upay.systems
-	password: Upay@321
-        to: m.jahangir.alam@ucb.com.bd
-        subject: "Browser Versions Report"
-        body: "Attached is the browser version report CSV."
-        attach: "{{ csv_file_path }}"
+    - name: Print browser versions
+      debug:
+        msg: |
+          Host: {{ inventory_hostname }}
+          Edge: {{ edge_version.stdout | default('Not found') }}
+          Chrome: {{ chrome_version.stdout | default('Not found') }}
+          Firefox: {{ firefox_version.stdout | default('Not found') }}
