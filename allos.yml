@@ -64,7 +64,7 @@
         port: 465
         username: ansible@upay.systems
         password: Upay@321
-        to: jahangir.alam@upaybd.com
+        to: m.jahangir.alam@ucb.com.bd
         subject: "OS Info Report"
         body: "Attached is the full OS information report for all servers."
         attach:
