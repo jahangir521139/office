@@ -1,0 +1,55 @@
+---
+- name: Disable browser password saving
+  hosts: windows
+  gather_facts: yes
+  tasks:
+
+    # --- CHROME ---
+    - name: Disable Chrome password saving via registry
+      win_regedit:
+        path: HKLM:\Software\Policies\Google\Chrome
+        name: PasswordManagerEnabled
+        data: 0
+        type: dword
+        state: present
+
+    - name: Ensure Chrome password saving prompt is disabled
+      win_regedit:
+        path: HKLM:\Software\Policies\Google\Chrome
+        name: CredentialsEnableService
+        data: 0
+        type: dword
+        state: present
+
+    # --- EDGE ---
+    - name: Disable Edge password saving via registry
+      win_regedit:
+        path: HKLM:\Software\Policies\Microsoft\Edge
+        name: PasswordManagerEnabled
+        data: 0
+        type: dword
+        state: present
+
+    - name: Ensure Edge password saving prompt is disabled
+      win_regedit:
+        path: HKLM:\Software\Policies\Microsoft\Edge
+        name: CredentialsEnableService
+        data: 0
+        type: dword
+        state: present
+
+    # --- FIREFOX ---
+    - name: Create Firefox policies directory
+      win_file:
+        path: "C:\\Program Files\\Mozilla Firefox\\distribution"
+        state: directory
+
+    - name: Deploy Firefox policies.json to disable password saving
+      win_copy:
+        dest: "C:\\Program Files\\Mozilla Firefox\\distribution\\policies.json"
+        content: |
+          {
+            "policies": {
+              "PasswordManagerEnabled": false
+            }
+          }
