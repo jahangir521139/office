@@ -1,6 +1,6 @@
 ---
 - name: Disable browser password saving
-  hosts: windows
+  hosts: all
   gather_facts: yes
   tasks:
 
