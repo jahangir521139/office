@@ -124,13 +124,13 @@
   gather_facts: false
 
   tasks:
-    - name: Email browser report and unreachable hosts report
+    - name: Email browser report
       community.general.mail:
-        host: prmenetbd.com
+        host: 103.159.0.237
         port: 465
-        username: ansible@prmenetbd.com
-        password: prmenetbd.com
-        to: m.jahangir.alam@prmenetbd.com
+        username: ansible@upay.systems
+        password: Upay@321
+        to: m.jahangir.alam@ucb.com.bd, mdjahangir521139@gmail.com
         subject: "Browser Version Report"
         body: |
           Dear Team,
