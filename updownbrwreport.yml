@@ -63,13 +63,14 @@
           {{ firefox_version.stdout | default('Not Found') | trim }}
       when: ansible_os_family == 'Windows'
 
+
 - name: Generate CSV Reports on Controller
   hosts: localhost
   gather_facts: false
 
   vars:
     browser_csv_header: "Hostname,IP,Edge,Chrome,Firefox"
-    unreachable_csv_header: "Hostname"
+    unreachable_csv_header: "Hostname,IP"
 
   tasks:
     - name: Build browser info CSV from reachable Windows hosts
@@ -77,7 +78,9 @@
         browser_csv: |
           {{ browser_csv_header }}
           {% for host in groups['all'] %}
-          {% if hostvars[host] is defined and hostvars[host].ansible_os_family is defined and hostvars[host].ansible_os_family == 'Windows' %}
+          {% if hostvars[host] is defined and
+                hostvars[host].ansible_os_family is defined and
+                hostvars[host].ansible_os_family == 'Windows' %}
           {{ hostvars[host].browser_info_line | default('N/A,N/A,N/A,N/A,N/A') | trim }}
           {% endif %}
           {% endfor %}
@@ -87,12 +90,14 @@
         content: "{{ browser_csv }}"
         dest: "./browser_info_report.csv"
 
-    - name: Build list of unreachable hosts
+    - name: Detect unreachable hosts (no facts or OS info)
       set_fact:
         unreachable_hosts_list: >-
           {% set unreachable = [] %}
           {% for host in groups['all'] %}
-            {% if hostvars[host] is not defined or hostvars[host].ansible_facts is not defined %}
+            {% if (hostvars[host] is not defined) or
+                  (hostvars[host].ansible_facts is not defined) or
+                  (hostvars[host].ansible_os_family is not defined) %}
               {% set _ = unreachable.append(host) %}
             {% endif %}
           {% endfor %}
@@ -101,15 +106,16 @@
     - name: Build unreachable host CSV
       set_fact:
         unreachable_csv: |
-          Hostname,IP
+          {{ unreachable_csv_header }}
           {% for host in unreachable_hosts_list %}
-          {{ host }},{{ hostvars[host]['ansible_host'] if ('ansible_host' in hostvars[host]) else host }}
+          {{ host }},{{ (hostvars[host]['ansible_host'] if ('ansible_host' in hostvars[host]) else host) }}
           {% endfor %}
 
     - name: Save unreachable host report to CSV file
       copy:
         content: "{{ unreachable_csv }}"
         dest: "./unreachable_hosts_report.csv"
+
 
 - name: Send Email with Reports
   hosts: localhost
@@ -125,9 +131,15 @@
         to: m.jahangir.alam@ucb.com.bd, mdjahangir521139@gmail.com
         subject: "Browser Version Report"
         body: |
-          Attached are two reports:
-          1. Browser version info from reachable Windows hosts.
-          2. List of unreachable/down hosts.
+          Dear Team,
+
+          Please find attached the latest browser version report.
+
+          - **browser_info_report.csv**: Reachable Windows hosts
+          - **unreachable_hosts_report.csv**: Hosts that could not be reached
+
+          Regards,
+          Ansible Automation
         attach:
           - "./browser_info_report.csv"
           - "./unreachable_hosts_report.csv"
