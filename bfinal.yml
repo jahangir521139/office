@@ -2,6 +2,7 @@
 - name: Collect Browser Info from Windows Hosts
   hosts: all
   gather_facts: true
+  ignore_unreachable: yes
 
   tasks:
     - name: Get Microsoft Edge version
