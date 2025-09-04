@@ -101,9 +101,9 @@
     - name: Build unreachable host CSV
       set_fact:
         unreachable_csv: |
-          {{ unreachable_csv_header }}
+          Hostname,IP
           {% for host in unreachable_hosts_list %}
-          {{ host }}
+          {{ host }},{{ hostvars[host].ansible_host | default(host) }}
           {% endfor %}
 
     - name: Save unreachable host report to CSV file
