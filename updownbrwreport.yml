@@ -1,0 +1,134 @@
+---
+- name: Collect Browser Info from Windows Hosts
+  hosts: all
+  gather_facts: true
+  ignore_unreachable: yes
+
+  tasks:
+    - name: Get Microsoft Edge version
+      win_shell: |
+        $paths = @(
+          'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
+          'C:\Program Files\Microsoft\Edge\Application\msedge.exe'
+        )
+        foreach ($path in $paths) {
+          if (Test-Path $path) {
+            (Get-Item $path).VersionInfo.ProductVersion
+            break
+          }
+        }
+      register: edge_version
+      ignore_errors: true
+      when: ansible_os_family == 'Windows'
+
+    - name: Get Google Chrome version
+      win_shell: |
+        $paths = @(
+          'C:\Program Files\Google\Chrome\Application\chrome.exe',
+          'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe'
+        )
+        foreach ($path in $paths) {
+          if (Test-Path $path) {
+            (Get-Item $path).VersionInfo.ProductVersion
+            break
+          }
+        }
+      register: chrome_version
+      ignore_errors: true
+      when: ansible_os_family == 'Windows'
+
+    - name: Get Mozilla Firefox version
+      win_shell: |
+        $paths = @(
+          'C:\Program Files\Mozilla Firefox\firefox.exe',
+          'C:\Program Files (x86)\Mozilla Firefox\firefox.exe'
+        )
+        foreach ($path in $paths) {
+          if (Test-Path $path) {
+            (Get-Item $path).VersionInfo.ProductVersion
+            break
+          }
+        }
+      register: firefox_version
+      ignore_errors: true
+      when: ansible_os_family == 'Windows'
+
+    - name: Set browser info line for each host
+      set_fact:
+        browser_info_line: >-
+          {{ ansible_hostname | default(inventory_hostname) }},
+          {{ ansible_host | default(inventory_hostname) }},
+          {{ edge_version.stdout | default('Not Found') | trim }},
+          {{ chrome_version.stdout | default('Not Found') | trim }},
+          {{ firefox_version.stdout | default('Not Found') | trim }}
+      when: ansible_os_family == 'Windows'
+
+- name: Generate CSV Reports on Controller
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    browser_csv_header: "Hostname,IP,Edge,Chrome,Firefox"
+    unreachable_csv_header: "Hostname"
+
+  tasks:
+    - name: Build browser info CSV from reachable Windows hosts
+      set_fact:
+        browser_csv: |
+          {{ browser_csv_header }}
+          {% for host in groups['all'] %}
+          {% if hostvars[host] is defined and hostvars[host].ansible_os_family is defined and hostvars[host].ansible_os_family == 'Windows' %}
+          {{ hostvars[host].browser_info_line | default('N/A,N/A,N/A,N/A,N/A') | trim }}
+          {% endif %}
+          {% endfor %}
+
+    - name: Save browser info to CSV file
+      copy:
+        content: "{{ browser_csv }}"
+        dest: "./browser_info_report.csv"
+
+    - name: Build list of unreachable hosts
+      set_fact:
+        unreachable_hosts_list: >-
+          {% set unreachable = [] %}
+          {% for host in groups['all'] %}
+            {% if hostvars[host] is not defined or hostvars[host].ansible_facts is not defined %}
+              {% set _ = unreachable.append(host) %}
+            {% endif %}
+          {% endfor %}
+          {{ unreachable }}
+
+    - name: Build unreachable host CSV
+      set_fact:
+        unreachable_csv: |
+          {{ unreachable_csv_header }}
+          {% for host in unreachable_hosts_list %}
+          {{ host }}
+          {% endfor %}
+
+    - name: Save unreachable host report to CSV file
+      copy:
+        content: "{{ unreachable_csv }}"
+        dest: "./unreachable_hosts_report.csv"
+
+- name: Send Email with Reports
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Email browser report
+      community.general.mail:
+        host: 103.159.0.237
+        port: 465
+        username: ansible@upay.systems
+        password: Upay@321
+        to: m.jahangir.alam@ucb.com.bd
+        subject: "Browser Version Report"
+        body: |
+          Attached are two reports:
+          1. Browser version info from reachable Windows hosts.
+          2. List of unreachable/down hosts.
+        attach:
+          - "./browser_info_report.csv"
+          - "./unreachable_hosts_report.csv"
+        secure: always
