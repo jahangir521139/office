@@ -122,7 +122,7 @@
         port: 465
         username: ansible@upay.systems
         password: Upay@321
-        to: m.jahangir.alam@ucb.com.bd
+        to: m.jahangir.alam@ucb.com.bd, mdjahangir521139@gmail.com
         subject: "Browser Version Report"
         body: |
           Attached are two reports:
