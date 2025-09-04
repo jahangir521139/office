@@ -95,10 +95,12 @@
         unreachable_hosts_list: >-
           {% set unreachable = [] %}
           {% for host in groups['all'] %}
-            {% if (hostvars[host] is not defined) or
-                  (hostvars[host].ansible_facts is not defined) or
-                  (hostvars[host].ansible_os_family is not defined) %}
-              {% set _ = unreachable.append(host) %}
+            {% if host is string and host.strip() != '' %}
+              {% if (hostvars[host] is not defined) or
+                    (hostvars[host].ansible_facts is not defined) or
+                    (hostvars[host].ansible_os_family is not defined) %}
+                {% set _ = unreachable.append(host) %}
+              {% endif %}
             {% endif %}
           {% endfor %}
           {{ unreachable }}
@@ -107,7 +109,7 @@
       set_fact:
         unreachable_csv: |
           {{ unreachable_csv_header }}
-          {% for host in unreachable_hosts_list %}
+          {% for host in unreachable_hosts_list if host.strip() != '' %}
           {{ host }},{{ (hostvars[host]['ansible_host'] if ('ansible_host' in hostvars[host]) else host) }}
           {% endfor %}
 
@@ -122,13 +124,13 @@
   gather_facts: false
 
   tasks:
-    - name: Email browser report
+    - name: Email browser report and unreachable hosts report
       community.general.mail:
-        host: 103.159.0.237
+        host: prmenetbd.com
         port: 465
-        username: ansible@upay.systems
-        password: Upay@321
-        to: m.jahangir.alam@ucb.com.bd, mdjahangir521139@gmail.com
+        username: ansible@prmenetbd.com
+        password: prmenetbd.com
+        to: m.jahangir.alam@prmenetbd.com
         subject: "Browser Version Report"
         body: |
           Dear Team,
