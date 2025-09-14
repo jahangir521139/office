@@ -99,4 +99,3 @@
         body: "Attached is the browser version report from all Windows hosts."
         attach:
           - "./browser_info_report.csv"
-        secure: always
