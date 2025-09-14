@@ -92,7 +92,7 @@
       community.general.mail:
         host: 172.25.10.51
         port: 25
-        secure: always
+        secure: starttls          
         username: m.jahangir.alam@ucb.com.bd
         password: Tasrif@521139
         to: m.jahangir.alam@ucb.com.bd
