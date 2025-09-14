@@ -90,10 +90,8 @@
   tasks:
     - name: Email browser report
       community.general.mail:
-        host: 103.159.0.237
-        port: 465
-        username: ansible@upay.systems
-        password: Upay@321
+        host: 172.25.10.51
+        port: 25
         to: m.jahangir.alam@ucb.com.bd
         subject: "Browser Version Report"
         body: "Attached is the browser version report from all Windows hosts."
