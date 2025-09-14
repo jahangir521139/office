@@ -93,8 +93,6 @@
         host: 172.25.10.51
         port: 25
         secure: starttls          
-        username: m.jahangir.alam@ucb.com.bd
-        password: Tasrif@521139
         to: m.jahangir.alam@ucb.com.bd
         subject: "Browser Version Report"
         body: "Attached is the browser version report from all Windows hosts."
