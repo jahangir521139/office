@@ -46,10 +46,4 @@
         subject: "Unbound Timer CSV Report"
         body: "Please find attached the unbound-anchor.timer status report in CSV format."
         attach:
-          - content: |
-              Host,Active,Enabled
-              {% for line in host_timer_status_list %}
-              {{ line }}
-              {% endfor %}
-            filename: unbound_timer_report.csv
-            mimetype: text/csv
+          - "./unbound_timer_report.csv
