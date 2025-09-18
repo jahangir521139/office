@@ -1,0 +1,23 @@
+---
+- name: Check unbound-anchor.timer status
+  hosts: all
+  gather_facts: no
+  tasks:
+
+    - name: Check if unbound-anchor.timer is active
+      ansible.builtin.command: systemctl is-active unbound-anchor.timer
+      register: timer_active
+      ignore_errors: yes
+
+    - name: Show timer active status
+      ansible.builtin.debug:
+        msg: "unbound-anchor.timer is {{ timer_active.stdout }}"
+
+    - name: Check if unbound-anchor.timer is enabled
+      ansible.builtin.command: systemctl is-enabled unbound-anchor.timer
+      register: timer_enabled
+      ignore_errors: yes
+
+    - name: Show timer enabled status
+      ansible.builtin.debug:
+        msg: "unbound-anchor.timer is {{ timer_enabled.stdout }} on boot"
