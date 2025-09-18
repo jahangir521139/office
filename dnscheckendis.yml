@@ -1,5 +1,5 @@
 ---
-- name: Check unbound-anchor.timer status and send CSV via email
+- name: Get unbound-anchor.timer status on all hosts
   hosts: all
   gather_facts: no
   tasks:
@@ -14,23 +14,27 @@
       register: timer_enabled
       failed_when: false
 
-    - name: Append host status to central list on localhost
-      ansible.builtin.set_fact:
-        timer_status_line: "{{ inventory_hostname + ',' + (timer_active.stdout | default('not found')) + ',' + (timer_enabled.stdout | default('not found on boot')) }}"
-      run_once: false
-      delegate_to: localhost
-      register: timer_status_line
+    - name: Set CSV line for each host
+      set_fact:
+        timer_info_line: "{{ inventory_hostname }},{{ timer_active.stdout | default('not found') }},{{ timer_enabled.stdout | default('not found on boot') }}"
 
-    - name: Add to global list on localhost
-      ansible.builtin.set_fact:
-        host_timer_status_list: "{{ host_timer_status_list | default([]) + [timer_status_line.timer_status_line] }}"
-      run_once: false
-      delegate_to: localhost
-
-- name: Send email with CSV attachment
+- name: Combine CSV report on controller
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
   tasks:
+
+    - name: Build CSV from all hosts
+      set_fact:
+        csv_report: |
+          Host,Active,Enabled
+          {% for host in groups['all'] %}
+          {{ hostvars[host].timer_info_line | default(host + ',not found,not found on boot') }}
+          {% endfor %}
+
+    - name: (Optional) Save CSV to file
+      copy:
+        content: "{{ csv_report }}"
+        dest: "./unbound_timer_report.csv"
 
     - name: Send CSV report as email attachment
       community.general.mail:
