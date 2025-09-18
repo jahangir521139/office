@@ -5,7 +5,7 @@
   tasks:
 
     - name: Ping the host
-      ansible.builtin.ping
+      ansible.builtin.ping:
       register: ping_result
       ignore_errors: yes
 
