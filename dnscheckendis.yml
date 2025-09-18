@@ -47,3 +47,4 @@
         body: "Please find attached the unbound-anchor.timer status report in CSV format."
         content:
           - "./unbound_timer_report.csv"
+        secure: always
