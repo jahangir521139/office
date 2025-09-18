@@ -8,8 +8,10 @@
       ansible.builtin.systemd:
         name: unbound-anchor.timer
         state: stopped
+      become: yes
 
     - name: Disable unbound-anchor.timer
       ansible.builtin.systemd:
         name: unbound-anchor.timer
         enabled: no
+      become: yes
