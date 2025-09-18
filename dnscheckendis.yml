@@ -1,5 +1,5 @@
 ---
-- name: Check unbound-anchor.timer status
+- name: Check unbound-anchor.timer status and send CSV via email
   hosts: all
   gather_facts: no
   tasks:
@@ -14,9 +14,18 @@
       register: timer_enabled
       failed_when: false
 
-    - name: Collect timer status per host
+    - name: Append host status to central list on localhost
       ansible.builtin.set_fact:
-        host_timer_status: "{{ host_timer_status | default([]) + [ inventory_hostname + ',' + (timer_active.stdout | default('not found')) + ',' + (timer_enabled.stdout | default('not found on boot')) ] }}"
+        timer_status_line: "{{ inventory_hostname + ',' + (timer_active.stdout | default('not found')) + ',' + (timer_enabled.stdout | default('not found on boot')) }}"
+      run_once: false
+      delegate_to: localhost
+      register: timer_status_line
+
+    - name: Add to global list on localhost
+      ansible.builtin.set_fact:
+        host_timer_status_list: "{{ host_timer_status_list | default([]) + [timer_status_line.timer_status_line] }}"
+      run_once: false
+      delegate_to: localhost
 
 - name: Send email with CSV attachment
   hosts: localhost
@@ -35,7 +44,7 @@
         attach:
           - content: |
               Host,Active,Enabled
-              {% for line in hostvars['localhost'].host_timer_status %}
+              {% for line in host_timer_status_list %}
               {{ line }}
               {% endfor %}
             filename: unbound_timer_report.csv
