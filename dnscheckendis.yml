@@ -45,6 +45,6 @@
         to: m.jahangir.alam@ucb.com.bd
         subject: "Unbound Timer CSV Report"
         body: "Please find attached the unbound-anchor.timer status report in CSV format."
-        content:
+        attach:
           - "./unbound_timer_report.csv"
         secure: always
