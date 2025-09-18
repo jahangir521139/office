@@ -14,8 +14,29 @@
       register: timer_enabled
       failed_when: false
 
-    - name: Show unbound-anchor.timer status
-      ansible.builtin.debug:
-        msg: >
-          unbound-anchor.timer is {{ timer_active.stdout | default('not found') }}
-          and {{ timer_enabled.stdout | default('not found on boot') }}
+    - name: Collect timer status per host
+      ansible.builtin.set_fact:
+        host_timer_status: "{{ host_timer_status | default([]) + [ inventory_hostname + ',' + (timer_active.stdout | default('not found')) + ',' + (timer_enabled.stdout | default('not found on boot')) ] }}"
+
+- name: Send email with CSV attachment
+  hosts: localhost
+  gather_facts: no
+  tasks:
+
+    - name: Send CSV report as email attachment
+      community.general.mail:
+        host: 172.23.18.26
+        port: 465
+        username: ansible@upay.systems
+        password: Upay@321
+        to: m.jahangir.alam@ucb.com.bd
+        subject: "Unbound Timer CSV Report"
+        body: "Please find attached the unbound-anchor.timer status report in CSV format."
+        attach:
+          - content: |
+              Host,Active,Enabled
+              {% for line in hostvars['localhost'].host_timer_status %}
+              {{ line }}
+              {% endfor %}
+            filename: unbound_timer_report.csv
+            mimetype: text/csv
