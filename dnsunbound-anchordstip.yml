@@ -1,0 +1,10 @@
+---
+  - name: Stop unbound-anchor.timer
+  ansible.builtin.systemd:
+    name: unbound-anchor.timer
+    state: stopped
+
+- name: Disable unbound-anchor.timer
+  ansible.builtin.systemd:
+    name: unbound-anchor.timer
+    enabled: no
