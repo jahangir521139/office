@@ -12,7 +12,7 @@
     - name: Show host status
       ansible.builtin.debug:
         msg: >
-          {{ inventory_hostname }} is 
+          {{ inventory_hostname }} is
           {% if ping_result is failed %}
             UNREACHABLE
           {% else %}
