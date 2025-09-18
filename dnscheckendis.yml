@@ -7,17 +7,15 @@
     - name: Check if unbound-anchor.timer is active
       ansible.builtin.command: systemctl is-active unbound-anchor.timer
       register: timer_active
-      ignore_errors: yes
-
-    - name: Show timer active status
-      ansible.builtin.debug:
-        msg: "unbound-anchor.timer is {{ timer_active.stdout }}"
+      failed_when: false
 
     - name: Check if unbound-anchor.timer is enabled
       ansible.builtin.command: systemctl is-enabled unbound-anchor.timer
       register: timer_enabled
-      ignore_errors: yes
+      failed_when: false
 
-    - name: Show timer enabled status
+    - name: Show unbound-anchor.timer status
       ansible.builtin.debug:
-        msg: "unbound-anchor.timer is {{ timer_enabled.stdout }} on boot"
+        msg: >
+          unbound-anchor.timer is {{ timer_active.stdout | default('not found') }}
+          and {{ timer_enabled.stdout | default('not found on boot') }}
