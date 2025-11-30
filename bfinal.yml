@@ -94,7 +94,7 @@
         port: 25
         secure: never 
         from: m.jahangir.alam@ucb.com.bd
-        to: m.jahangir.alam@ucb.com.bd, shahriar.khan@ucb.com.bd
+        to: m.jahangir.alam@ucb.com.bd
         subject: "Browser Version Report"
         body: "Attached is the browser version report from all Windows hosts."
         attach:
